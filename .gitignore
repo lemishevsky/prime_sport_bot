@@ -1,0 +1,8 @@
+/node_modules
+/test
+/pictures
+*.log
+.idea
+.vscode
+*.xlsx
+.env
