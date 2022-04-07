@@ -1,0 +1,30 @@
+{
+  "name": "prime_sport_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lemishevsky/prime_sport_bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lemishevsky/prime_sport_bot/issues"
+  },
+  "homepage": "https://github.com/lemishevsky/prime_sport_bot#readme",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "dotenv": "^16.0.0",
+    "mongoose": "^6.2.6",
+    "nodemon": "^2.0.15",
+    "read-excel-file": "^5.2.28",
+    "string-comparison": "^1.1.0",
+    "telegraf": "^4.7.0",
+    "tesseract.js": "^2.1.5"
+  }
+}
