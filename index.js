@@ -49,8 +49,7 @@ bot.on('photo', async (ctx) => {
         logger: m => console.log(m)
       });
     const fileId = ctx.message.photo[2].file_id;
-    const photoURL = await ctx.telegram.getFileLink(fileId);
-    const { href } = photoURL;
+    const { href } = await ctx.telegram.getFileLink(fileId);
     await worker.load();
     await worker.loadLanguage('rus');
     await worker.initialize('rus');
