@@ -1,79 +1,97 @@
-const { config } = require('dotenv');
 const { Telegraf } = require('telegraf');
 const mongoose = require('mongoose');
-const Feedback = require('./model');
+const Feedback = require('./feedbackModel');
+const FeedbackFromBot = require('./feedbackFromBotModel');
 const stringComparison = require('string-comparison');
-const { createWorker } = require('tesseract.js');
+const Tesseract = require('tesseract.js');
+const userBlock = require('telegraf-userblock');
+const { GREETINGS, FIRST_ANSWER, CORRECT_FEEDBACK, REPEATED_ANSWER, FEEDBACK_NOT_FOUND, UPDATE_DB_PERIOD, ONE_DAY } = require('./_const');
+const { feedbackGrab } = require('./fbgrabber');
+const { lostFeedbacks } = require('./lostFeedbacks')
 
 require('dotenv').config()
 
 let MongoKey = process.env.MONGO_ONLINE;
 let ls = stringComparison.levenshtein;
 
-const PROMO = 'PRIME_SPORT_PROMO';
-const SEND_TEXT = 'send_text';
-const SEND_SCREENSHOT = 'send_screenshot';
-
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-let feedbacks = [];
+bot.use(
+    userBlock({
+        onUserBlock: (ctx, next, userId) => {
+            console.log('This user %s has blocked the bot.', userId);
+            return next();
+        },
+    })
+);
 
-bot.start(async (ctx) => {
-    await ctx.reply(`${ctx.message.from.first_name}, добро пожаловать в Telegram Bot Prime Sport! Отправь свой отзыв текстом или скриншот и получишь промокод!`, {
-        reply_markup: {
-            inline_keyboard: [
-                [ { text: "Отправить текст", callback_data: SEND_TEXT } ], 
-                [ { text: "Отправить скриншот", callback_data: SEND_SCREENSHOT } ],
-            ]
-        }
-    });
-
+bot.start((ctx) => {
+    ctx.reply(GREETINGS(ctx.message.from.first_name));
 });
 
 bot.on('text', async (ctx) => {
-    await mongoose.connect(MongoKey, { useNewUrlParser: true, useUnifiedTopology: true });
-    feedbacks = await Feedback.find({}, {id:1, feedback:1, checked:1});
-    let match = feedbacks.find((el => ls.similarity(el.feedback, ctx.message.text)>0.8));
-    if (match&&!match.checked) {
-        await ctx.reply('Держи свой промокод!');
-        await ctx.reply(PROMO);
-        await Feedback.updateOne({id:match.id}, {checked: true})
-    }
-        else (match&&match.checked)?ctx.reply('Для данного отзыва промокод уже отправлен!'):ctx.reply('Нет такого отзыва:(');
-    await mongoose.connection.close();
+    dbChecker(0.8, ctx, ctx.message.text);
 });
 
 bot.on('photo', async (ctx) => {
-    await mongoose.connect(MongoKey, { useNewUrlParser: true, useUnifiedTopology: true });
-    const worker = createWorker({
-        logger: m => console.log(m)
-      });
+    let counter = 2;
+    console.log(counter);
+    ctx.reply('Обрабатываем фото...');  
     const fileId = ctx.message.photo[2].file_id;
     const { href } = await ctx.telegram.getFileLink(fileId);
-    await worker.load();
-    await worker.loadLanguage('rus');
-    await worker.initialize('rus');
-    const { data: { text } } = await worker.recognize(href);
-    console.log(text);
-    await worker.terminate();
-    feedbacks = await Feedback.find({}, {id:1, feedback:1, checked:1});
-    let match = feedbacks.find((el => ls.similarity(el.feedback, text)>0.6));
-    if (match&&!match.checked) {
-        await ctx.reply('Держи свой промокод!');
-        await ctx.reply(PROMO);
-        await Feedback.updateOne({id:match.id}, {checked: true})
-    }
-        else (match&&match.checked)?ctx.reply('Для данного отзыва промокод уже отправлен!'):ctx.reply('Нет такого отзыва:(');
-        await mongoose.connection.close();
+    Tesseract.recognize(
+        href,
+        'rus',
+        { logger: m => { 
+            const progress = m.progress.toFixed(2);
+            if  (progress>0.45 && m.status==='recognizing text'&&counter===2) {
+            ctx.reply('Еще немного...');
+            counter-=1;
+            }
+            if  (progress>0.75 && m.status==='recognizing text'&&counter===1){
+                ctx.reply('Уже почти...');
+                counter-=1;
+        }
+            return console.log(m);
+        }})
+        .then(({ data: { text } }) => {
+        console.log(text);
+        ctx.reply(`Твой отзыв: ${text}`);
+        return text;
+      })
+      .then( text => dbChecker(0.6, ctx, text))
 });
 
-// bot.action(SEND_TEXT, async (ctx) => {
-//     return ctx.reply('Отправь текст своего отзыва в сообщении!');
-// });
+async function dbChecker(accuracy, ctx, text){
+    ctx.reply(FIRST_ANSWER);
+    await mongoose.connect(MongoKey, { useNewUrlParser: true, useUnifiedTopology: true });
+    let feedbacks = [];
+    feedbacks = await Feedback.find({}, {id:1, feedback:1, checked:1});
+    let match = feedbacks.find((el => ls.similarity(el.feedback, text)>accuracy));
+    if (match&&!match.checked) {
+        setTimeout(() => ctx.replyWithHTML(CORRECT_FEEDBACK), 2000);
+        await Feedback.updateOne({id:match.id}, {checked: true})
+    }
+        else if (match&&match.checked){
+            setTimeout(() => ctx.replyWithHTML(REPEATED_ANSWER), 2000);
+        }
+        else {
+            setTimeout(() => ctx.replyWithHTML(FEEDBACK_NOT_FOUND), 2000);
+            const feedbackDate = new Date(ctx.message.date*1000);
+            const feedback = new FeedbackFromBot({
+                chatId:ctx.from.id, 
+                date:feedbackDate, 
+                feedback: text,
+                username: ctx.username,
+                checked: false });
+            await feedback.save();
+        }
+    await mongoose.connection.close();
+} 
 
-// bot.action(SEND_SCREENSHOT, async (ctx) => {
-//     return ctx.reply('Отправь скриншот!');
-// });
+setInterval(() => feedbackGrab(bot, ls), UPDATE_DB_PERIOD);
+
+setInterval(() => lostFeedbacks(bot), ONE_DAY);
 
 bot.launch();
 

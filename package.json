@@ -21,10 +21,12 @@
     "axios": "^0.26.1",
     "dotenv": "^16.0.0",
     "mongoose": "^6.2.6",
+    "node-fetch": "^2.6.7",
     "nodemon": "^2.0.15",
     "read-excel-file": "^5.2.28",
     "string-comparison": "^1.1.0",
     "telegraf": "^4.7.0",
+    "telegraf-userblock": "^1.0.1",
     "tesseract.js": "^2.1.5"
   }
 }

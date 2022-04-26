@@ -5,7 +5,6 @@ const feedbackSchema = new Schema({
     date: Date,
     nomenclature: String,
     rate: Number,
-    brand: String,
     feedback: String,
     customerName: String,
     checked: Boolean,
