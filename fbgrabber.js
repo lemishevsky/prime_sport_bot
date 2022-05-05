@@ -24,8 +24,12 @@ const fetches = IMT_ID.map(elem => {
             body: JSON.stringify(body)});
 });
 const results = await Promise.allSettled(fetches);
-const data = await Promise.allSettled(results.map((result) => result.value.json()));
-const feedbacks = data.map(elem => elem.value.feedbacks).flat();
+let data = []
+if (results) {
+    data = await Promise.allSettled(results.map((result) => result.value.json()));
+} 
+const feedbacks = data.map(elem => elem.value.feedbacks).flat() || [];
+const _idArrayFeedbacksFromBot = [];
 const feedBacksForDB = feedbacks
         .filter(feedback => feedback.createdDate>START_PROMO_DAY)
         .map(({ id, createdDate, text, wbUserDetails, productDetails, rank })  => { return { 
@@ -45,15 +49,15 @@ feedbacksFromBot.forEach(elem => {
         if (!e.checked && !elem.checked && ls.similarity(e.feedback, elem.feedback)>0.8) {
             bot.telegram.sendMessage(elem.chatId, CORRECT_FEEDBACK);
             e.checked = true;
-            elem.checked = true;
+            _idArrayFeedbacksFromBot.push(elem._id);
             return;
         }
     })
     
 });
-await FeedbackFromBot.updateMany(feedbacksFromBot);
 await Feedback.insertMany(newFeedbacks);
-mongoose.connection.close();
-}
+await FeedbackFromBot.updateMany({_idArrayFeedbacksFromBot}, {checked: true});
+await mongoose.connection.close();
+};
 
 module.exports = { feedbackGrab };

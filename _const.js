@@ -12,7 +12,13 @@ const UPDATE_DB_PERIOD = 1000*60*10; // 10 min
 
 const ONE_DAY = 1000 * 60 * 60 * 24; // 24 hours
 
-const START_PROMO_DAY = '2022-04-25T00:00:00.000Z'
+const TEXT_DELAY = 1000 * 3;
+
+const START_PROMO_DAY = '2022-04-25T00:00:00.000Z'; // отсечка даты начала сбора отзывов
+
+const WORK_IN_PROGRESS = ['Обрабатываем фото...', 'Еще немного...', 'Уже почти...']; // текст для обратной связи во время распознания картинки
+
+const WORK_IS_DONE = 'Я прочитал твою картинку, твой отзыв:';
 
 //Api для получения фидбэков
 const FEEDBACK_API = 'https://public-feedbacks.wildberries.ru/api/v1/feedbacks/site';
@@ -47,8 +53,11 @@ const FINAL_ANSWER = 'Удачных тренировок! Буду держат
 module.exports = {
     IMT_ID,
     UPDATE_DB_PERIOD,
+    TEXT_DELAY,
     START_PROMO_DAY,
     ONE_DAY,
+    WORK_IN_PROGRESS,
+    WORK_IS_DONE,
     FEEDBACK_API,
     GREETINGS, 
     FIRST_ANSWER,
