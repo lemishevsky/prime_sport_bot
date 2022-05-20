@@ -24,15 +24,27 @@ const fetches = IMT_ID.map(elem => {
             body: JSON.stringify(body)});
 });
 const results = await Promise.allSettled(fetches);
-let data = []
+let data = [];
 if (results) {
-    data = await Promise.allSettled(results.map((result) => result.value.json()));
+    data = await Promise.allSettled(results.map((result) => {
+        if (result.value){
+            return result.value.json()
+        }
+    }));
 } 
-const feedbacks = data.map(elem => elem.value.feedbacks).flat() || [];
+const feedbacks = data.map(elem => { if (elem.value){
+    return elem.value.feedbacks;
+}}) || [];
 const _idArrayFeedbacksFromBot = [];
 const feedBacksForDB = feedbacks
-        .filter(feedback => feedback.createdDate>START_PROMO_DAY)
+        .flat()
+        .filter(feedback => {
+            if (feedback){
+                return feedback.createdDate>START_PROMO_DAY
+            }
+        })
         .map(({ id, createdDate, text, wbUserDetails, productDetails, rank })  => { return { 
+            chatId: "",
             id,
             date: createdDate,
             nomenclature: productDetails.supplierArticle,
@@ -49,6 +61,7 @@ feedbacksFromBot.forEach(elem => {
         if (!e.checked && !elem.checked && ls.similarity(e.feedback, elem.feedback)>0.8) {
             bot.telegram.sendMessage(elem.chatId, CORRECT_FEEDBACK);
             e.checked = true;
+            e.chatId = elem.chatId;
             _idArrayFeedbacksFromBot.push(elem._id);
             return;
         }

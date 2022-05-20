@@ -36,7 +36,8 @@ bot.use(
     })
 );
 
-bot.start((ctx) => {
+bot.start(async(ctx) => {
+    // console.log(ctx.message.chat);
     ctx.reply(GREETINGS(ctx.message.from.first_name));
 });
 
@@ -81,7 +82,7 @@ async function dbChecker(accuracy, ctx, text){
     let match = feedbacks.find((el => ls.similarity(el.feedback, text)>accuracy));
     if (match&&!match.checked) {
         setTimeout(() => ctx.replyWithHTML(CORRECT_FEEDBACK), TEXT_DELAY);
-        await Feedback.updateOne({id:match.id}, {checked: true})
+        await Feedback.updateOne({id:match.id}, {checked: true, chatId: ctx.from.id})
     }
         else if (match&&match.checked){
             setTimeout(() => ctx.replyWithHTML(REPEATED_ANSWER), TEXT_DELAY);

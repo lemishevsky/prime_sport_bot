@@ -1,6 +1,7 @@
 const { Schema, model } = require('mongoose');
 
 const feedbackSchema = new Schema({
+    chatId: String,
     id: String,
     date: Date,
     nomenclature: String,
