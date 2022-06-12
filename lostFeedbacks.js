@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const FeedbackFromBot = require('./feedbackFromBotModel');
-const { FEEDBACK_NOT_FOUND_24 } = require('./_const')
+const FeedbackFromBotStart = require('./feedbackFromBotModel');
+const { FEEDBACK_NOT_FOUND_24 } = require('./_const_start_bot')
 
 require('dotenv').config()
 
@@ -18,7 +18,7 @@ async function lostFeedbacks(bot) {
             _idArray.push(elem._id);
         }
     })
-    await FeedbackFromBot.updateMany({_idArray}, {checked: true});
+    await FeedbackFromBotStart.updateMany({_idArray}, {checked: true});
     await mongoose.connection.close();
 };
 

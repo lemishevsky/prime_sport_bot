@@ -1,5 +1,5 @@
 const { Telegraf } = require('telegraf');
-const { CORRECT_FEEDBACK } = require('./_const')
+const { CORRECT_FEEDBACK } = require('./_const_start_bot')
 
 require('dotenv').config()
 

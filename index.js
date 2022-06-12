@@ -1,6 +1,6 @@
 const { Telegraf } = require('telegraf');
 const mongoose = require('mongoose');
-const Feedback = require('./feedbackModel');
+const FeedbackStart = require('./feedbackModel');
 const FeedbackFromBot = require('./feedbackFromBotModel');
 const stringComparison = require('string-comparison');
 const Tesseract = require('tesseract.js');
@@ -16,7 +16,7 @@ const {
     TEXT_DELAY, 
     WORK_IN_PROGRESS, 
     WORK_IS_DONE 
-} = require('./_const');
+} = require('./_const_start_bot');
 const { feedbackGrab } = require('./fbgrabber');
 const { lostFeedbacks } = require('./lostFeedbacks')
 
@@ -78,11 +78,11 @@ bot.on('photo', async (ctx) => {
 async function dbChecker(accuracy, ctx, text){
     await mongoose.connect(MongoKey, { useNewUrlParser: true, useUnifiedTopology: true });
     let feedbacks = [];
-    feedbacks = await Feedback.find({}, {id:1, feedback:1, checked:1});
+    feedbacks = await FeedbackStart.find({}, {id:1, feedback:1, checked:1});
     let match = feedbacks.find((el => ls.similarity(el.feedback, text)>accuracy));
     if (match&&!match.checked) {
         setTimeout(() => ctx.replyWithHTML(CORRECT_FEEDBACK), TEXT_DELAY);
-        await Feedback.updateOne({id:match.id}, {checked: true, chatId: ctx.from.id})
+        await FeedbackStart.updateOne({id:match.id}, {checked: true, chatId: ctx.from.id})
     }
         else if (match&&match.checked){
             setTimeout(() => ctx.replyWithHTML(REPEATED_ANSWER), TEXT_DELAY);
@@ -90,7 +90,7 @@ async function dbChecker(accuracy, ctx, text){
         else {
             setTimeout(() => ctx.replyWithHTML(FEEDBACK_NOT_FOUND), TEXT_DELAY);
             const feedbackDate = new Date(ctx.message.date*1000);
-            const feedback = new FeedbackFromBot({
+            const feedback = new FeedbackFromBotStart({
                 chatId:ctx.from.id, 
                 date:feedbackDate, 
                 feedback: text.split('\n').join(' '),

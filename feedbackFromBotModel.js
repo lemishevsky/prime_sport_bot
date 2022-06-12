@@ -1,7 +1,7 @@
 const { Schema, model } = require('mongoose');
 
 
-const feedbackFromBotSchema = new Schema({
+const feedbackFromBotStartSchema = new Schema({
     chatId: String,
     date: Date,
     feedback: String,
@@ -9,4 +9,4 @@ const feedbackFromBotSchema = new Schema({
     checked: Boolean,
 });
 
-module.exports = model("FeedbackFromBot", feedbackFromBotSchema);
+module.exports = model("FeedbackFromBotStart", feedbackFromBotStartSchema);

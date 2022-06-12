@@ -1,9 +1,8 @@
-const { IMT_ID, FEEDBACK_API } = require('./_const');
+const { IMT_ID, FEEDBACK_API, START_PROMO_DAY } = require('./_const_start_bot');
 const fetch = require('node-fetch');
 const mongoose = require('mongoose');
-const Feedback = require('./feedbackModel');
-const FeedbackFromBot = require('./feedbackFromBotModel')
-const { START_PROMO_DAY } = require('./_const');
+const FeedbackStart = require('./feedbackModel');
+const FeedbackFromBotStart = require('./feedbackFromBotModel')
 
 require("dotenv").config();
 
@@ -53,9 +52,9 @@ const feedBacksForDB = feedbacks
             customerName: wbUserDetails.name,
             checked: false,
         }})
-const feedbacksFromDB = await Feedback.find({}, {id:1});
+const feedbacksFromDB = await FeedbackStart.find({}, {id:1});
 const newFeedbacks = feedBacksForDB.filter(elem => !feedbacksFromDB.some(e=>e.id===elem.id));
-const feedbacksFromBot = await FeedbackFromBot.find({checked:false});
+const feedbacksFromBot = await FeedbackFromBotStart.find({checked:false});
 feedbacksFromBot.forEach(elem => {
     newFeedbacks.forEach(e => {
         if (!e.checked && !elem.checked && ls.similarity(e.feedback, elem.feedback)>0.8) {
@@ -68,8 +67,8 @@ feedbacksFromBot.forEach(elem => {
     })
     
 });
-await Feedback.insertMany(newFeedbacks);
-await FeedbackFromBot.updateMany({_idArrayFeedbacksFromBot}, {checked: true});
+await FeedbackStart.insertMany(newFeedbacks);
+await FeedbackFromBotStart.updateMany({_idArrayFeedbacksFromBot}, {checked: true});
 await mongoose.connection.close();
 };
 

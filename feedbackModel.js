@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-const feedbackSchema = new Schema({
+const feedbackStartSchema = new Schema({
     chatId: String,
     id: String,
     date: Date,
@@ -11,4 +11,4 @@ const feedbackSchema = new Schema({
     checked: Boolean,
 });
 
-module.exports = model("Feedback", feedbackSchema);
+module.exports = model("FeedbackStart", feedbackStartSchema);
