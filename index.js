@@ -25,7 +25,7 @@ require('dotenv').config()
 let MongoKey = process.env.MONGO_ONLINE;
 let ls = stringComparison.levenshtein;
 
-const bot = new Telegraf(process.env.BOT_TOKEN);
+const bot = new Telegraf(process.env.BOT_TOKEN_START);
 
 bot.use(
     userBlock({
