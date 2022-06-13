@@ -1,7 +1,7 @@
 const { Telegraf } = require('telegraf');
 const mongoose = require('mongoose');
 const FeedbackStart = require('./feedbackModel');
-const FeedbackFromBot = require('./feedbackFromBotModel');
+const FeedbackFromBotStart = require('./feedbackFromBotModel');
 const stringComparison = require('string-comparison');
 const Tesseract = require('tesseract.js');
 const userBlock = require('telegraf-userblock');

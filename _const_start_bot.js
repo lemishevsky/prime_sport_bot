@@ -49,7 +49,6 @@ const FINAL_ANSWER = 'Приятного просмотра! Когда бесп
 
 module.exports = {
     IMT_ID,
-    ALTERNATIVE_IMT_ID,
     UPDATE_DB_PERIOD,
     TEXT_DELAY,
     START_PROMO_DAY,
