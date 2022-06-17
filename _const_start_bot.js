@@ -10,7 +10,17 @@ const IMT_ID = [
     12446501,
     12444751,
     12444752,
-    12444753
+    12444753,
+    12444013,
+    12444014,
+    12444015,
+    12446500,
+    12444754,
+    12444755,
+    12444756,
+    49205605,
+    60478198,
+    49205704
 ];
 
 const UPDATE_DB_PERIOD = 1000*60*10; // 10 min
@@ -32,7 +42,7 @@ const FEEDBACK_API = 'https://public-feedbacks.wildberries.ru/api/v1/feedbacks/s
 const PROMO_URL = "https://start.ru/code?promocode=psr4gh56wb";
 
 // Контактный email
-const EMAIL = 'konovalova.a@prime-sport.ru';
+const EMAIL = 'skripkina.k@prime-sport.ru';
 
 // Приветствие
 const GREETINGS = name => `Привет, ${name}! Добро пожаловать в Telegram Bot Prime Sport. Отправь скриншот своего отзыва или скопируй сюда его текст и получишь в подарок 21 день подписки на START! Чтобы точно все получилось, постарайся отправлять скрин без лишнего текста: если на снимке будет больше 40% другой информации, я не смогу распознать отзыв.`;

@@ -8,7 +8,7 @@ let MongoKey = process.env.MONGO_ONLINE;
 
 async function lostFeedbacks(bot) {
     await mongoose.connect(MongoKey, { useNewUrlParser: true, useUnifiedTopology: true });
-    const feedbacks = await FeedbackFromBot.find({checked: false});
+    const feedbacks = await FeedbackFromBotStart.find({checked: false});
     const yesterday = new Date(Date.now() - 1000 * 60 * 60 * 24);
     const _idArray = [];
     feedbacks.forEach(async (elem) => {
