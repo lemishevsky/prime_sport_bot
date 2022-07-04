@@ -36,8 +36,13 @@ bot.use(
     })
 );
 
+bot.use( (ctx, next) => {
+            console.log(ctx);
+            next();
+        }
+);
+
 bot.start(async(ctx) => {
-    // console.log(ctx.message.chat);
     ctx.reply(GREETINGS(ctx.message.from.first_name));
 });
 
@@ -50,7 +55,13 @@ bot.on('photo', async (ctx) => {
     ctx.reply(FIRST_ANSWER);
     let counter = 2;
     setTimeout(() => ctx.reply(WORK_IN_PROGRESS[0]), TEXT_DELAY);  
-    const fileId = ctx.message.photo[2].file_id;
+    let fileId ='';
+    if (ctx.message.photo[2].file_id){
+        fileId = ctx.message.photo[2].file_id;
+    }
+    else {
+        fileId = ctx.message.photo[1].file_id;
+    }
     const { href } = await ctx.telegram.getFileLink(fileId);
     Tesseract.recognize(
         href,
